@@ -1,0 +1,124 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <title>PhoneGap</title>
+        <script type="text/javascript" src="cordova-2.7.0.js">
+        </script>
+         <link rel="stylesheet" href="http://code.jquery.com/mobile/1.3.1/jquery.mobile-1.3.1.min.css" />
+  <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+  <script src="http://code.jquery.com/mobile/1.3.1/jquery.mobile-1.3.1.min.js"></script>
+        <script type="text/javascript">
+            var filename = "lee-escribe.txt";
+            var filePath = "file:///sdcard/lee-escribe.txt";
+                        var textarea = document.getElementById("textarea");
+            /** Called when phonegap javascript is loaded */
+            function onDeviceReady(){
+                var readButton = document.getElementById("read");
+                var writeButton = document.getElementById("write");
+                
+                readButton.addEventListener("click", readFile, false);
+                writeButton.addEventListener("click", saveFile, false);
+                
+            }
+            
+            function readFile(){
+                
+                window.resolveLocalFileSystemURI(    //filename to be read
+                filePath,    //success callback 
+                function(fileEntry){
+                        fileEntry.file(
+                                                function(file){
+                                                        var fileReader = new FileReader();
+                                        fileReader.onloadend = function(evt){
+                                        document.getElementById("textarea").value = evt.target.result;
+                                        };
+                                        fileReader.readAsText(file);
+                                                },
+                                                function(error){
+                                                        alert("Error mientras se leia el archivo "+filePath);
+                                                })
+                },    //error callback
+                function(error){
+                    alert(filename + " Por favor primero escribe algo antes de dar clic en el boton escribir archivo");
+                });
+                
+            }
+            
+            function saveFile(){
+            
+                window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, function(fileSystem){
+                                        alert(fileSystem.name);
+                    var sdcardEntry = fileSystem.root;
+                                        sdcardEntry.getFile(
+                                                filename,
+                                                {create:true},
+                                                function(fileEntry){
+                                                        fileEntry.createWriter(
+                                                                function(fileWriter){
+                                                                         fileWriter.onwrite = function(evt) {
+                                                                        alert("Se guardo exitosamente!");
+                                                                                document.getElementById("textarea").value="";
+                                                                 };
+                                                                         fileWriter.write(document.getElementById("textarea").value);
+                                                                },
+                                                                function(error){
+                                                                        alert("Error mientras el archivo se escribia para "+filename);                                                                     
+                                                                });
+                                                        
+                                                        
+                                                        
+                                                },
+                                                function(error){
+                                                        alert("Error mientras se lee el archivo "+filename+" "+error);
+                                                }
+                                                ) ;          
+                    
+                }, function(error){
+                    alert("Se ha obtenido un error mientras se intenta acceder al archivo del sistema");
+                });
+                
+                
+                
+            }
+            
+            
+            
+            /** Called when browser load this page*/
+            function init(){
+                document.addEventListener("deviceready", onDeviceReady, false);
+            }
+        </script>
+    </head>
+<body onLoad="init()">
+<div data-role="header">
+    
+	
+	<a href="javascript:history.back(-1)" data-icon="arrow-l">Regresar</a>	
+   <h1>Bienvenido</h1> 
+    <a href='index.html' data-icon="back" data-theme="b">Salir</a>	
+	</div>
+
+<h1>Leer y escribir archivos</h1>
+    <table width="368" height="309">
+        <tr>
+            <td colspan="2">
+                /sdcard/lee-escribe.txt
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <textarea id="textarea" rows="10" cols="30" style="width:80%">
+                    </textarea>
+            </td>
+        </tr>
+        <tr>
+            <td width="84">
+                <button id="read"  data-inline="true" data-theme="b">Leer archivo</button>
+            </td>
+            <td width="362">
+                <button id="write"  data-inline="true">Escribir archivo</button>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

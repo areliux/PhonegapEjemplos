@@ -1,0 +1,107 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+     <meta charset="UTF-8">
+        <title>PhoneGap DB</title>
+         <link rel="stylesheet" href="http://code.jquery.com/mobile/1.3.1/jquery.mobile-1.3.1.min.css" />
+  <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+  <script src="http://code.jquery.com/mobile/1.3.1/jquery.mobile-1.3.1.min.js"></script>
+        <script type="text/javascript" charset="utf-8" src="cordova-2.7.0.js"></script>
+
+
+<link href="/twitter-bootstrap/twitter-bootstrap-v2/docs/assets/css/bootstrap.css" rel="stylesheet">   
+       
+        <script type="text/javascript">
+
+        // Espere a que PhoneGap se inicie
+        //
+        document.addEventListener("deviceready", onDeviceReady, false);
+
+        // PhoneGap esta listo
+        //
+        function onDeviceReady() {
+            playAudio("http://audio.ibeat.org/content/p1rj1s/p1rj1s_-_rockGuitar.mp3");
+        }
+
+        // Un reproductor de audio
+        //
+        var my_media = null;
+        var mediaTimer = null;
+
+        // Reproduce el audio
+        //
+        function playAudio(src) {
+            // Crea un objeto `Media` desde el argumento
+            my_media = new Media(src, onSuccess, onError);
+
+            // Reproduce el audio
+            my_media.play();
+            // Actualiza la posición cada segundo
+            mediaTimer = setInterval(function() {
+                // Obtiene la posición actual
+                my_media.getCurrentPosition(
+                    // Función 'callback' satisfactoria
+                    function(position) {
+                        if (position > -1) {
+                            setAudioPosition(position + " seg");
+                        }
+                    },
+                    // error callback
+                    function(e) {
+                        console.log("Error obteniendo posición=" + e);
+                    }
+                );
+            }, 1000);
+            // Pasados 5 segundos, cambia la posición hacia el segundo numero 10
+            setTimeout(function() {
+                my_media.seekTo(10000);
+            }, 5000);
+        }
+
+        // Detiene la reproducción
+        // 
+        function stopAudio() {
+            if (my_media) {
+                my_media.stop();
+            }
+            clearInterval(mediaTimer);
+            mediaTimer = null;
+        }
+
+        // Función 'callback' satisfactoria
+        //
+        function onSuccess() {
+            console.log("playAudio():Audio correcto");
+        }
+
+        // Función 'callback' de error
+        //
+        function onError(error) {
+            alert('código: '  + error.code    + '\n' + 
+                  'mensaje: ' + error.message + '\n');
+        }
+
+        // Muestra la posición
+        // 
+        function setAudioPosition(position) {
+            document.getElementById('audio_position').innerHTML = position;
+        }
+        </script>
+
+        </style>
+    </head>
+    <body>
+  <div data-role="header">
+      <a href="#home"  data-icon="arrow-l">Regresar</a>
+	<h1>Media </h1>
+	<a href="#inicio" data-icon="back" data-theme="b">Salir</a>
+	</div>
+
+	<!--div data-role="content"-->	
+ <a href="#" class="btn large" onclick="playAudio('http://audio.ibeat.org/content/p1rj1s/p1rj1s_-_rockGuitar.mp3');">Reproducir</a>
+        <a href="#" class="btn large" onclick="stopAudio();">Detener</a>
+        <p id="audio_position"></p>
+
+<!--/div--->
+    </body>
+</html>

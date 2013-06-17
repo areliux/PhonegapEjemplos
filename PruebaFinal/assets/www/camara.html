@@ -1,0 +1,181 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+     <meta charset="UTF-8">
+        <title>PhoneGap DB</title>
+         <link rel="stylesheet" href="http://code.jquery.com/mobile/1.3.1/jquery.mobile-1.3.1.min.css" />
+  <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+  <script src="http://code.jquery.com/mobile/1.3.1/jquery.mobile-1.3.1.min.js"></script>
+        <script type="text/javascript" charset="utf-8" src="cordova-2.7.0.js"></script>
+
+
+<link href="/twitter-bootstrap/twitter-bootstrap-v2/docs/assets/css/bootstrap.css" rel="stylesheet">   
+       
+        <script type="text/javascript">
+            var firstNameBox = null;
+                        var lastNameBox = null;
+            var db = null;
+            var dataTable = null;
+            /** Called when phonegap javascript is loaded */
+            function onDeviceReady(){
+                var addButton = document.getElementById("add");
+                                firstNameBox = document.getElementById("firstName");
+                                lastNameBox = document.getElementById("lastName");
+                                dataTable = document.getElementById("data-table");
+                                
+                                db = window.openDatabase("contactDB", "1.0", "Contact Database", 1000000);//name,version,display name, size
+                addButton.addEventListener(
+                                        "click",
+                                        function(){
+                                                
+                                                db.transaction(
+                                                        //function sql statements
+                                                        function (tx){
+                                                                ensureTableExists(tx);
+                                                                var firstName = firstNameBox.value;
+                                                                var lastName = lastNameBox.value;
+                                                                
+                                                                var sql = 'INSERT INTO Contacts (firstName, lastName) VALUES ("'+firstName+'","'+lastName+'")';
+                                                                tx.executeSql(sql);
+                                                        
+                                                        },
+                                                        //error callback
+                                                        function (err){
+                                                                alert("error callback "+err.code);
+                                                                
+                                                        },
+                                                        //success callback
+                                                        function (err){
+                                                                //alert("success callback "+err.code);
+                                                                loadFromDB();
+                                                        }
+                                                        );
+                                                
+                                                
+                        }, 
+                                        false);
+                                loadFromDB();
+                
+            }
+            
+                        function loadFromDB(){
+                                
+                                db.transaction(
+                                                        //function sql statements
+                                                        function (tx){
+                                                                ensureTableExists(tx);
+                                                                tx.executeSql('SELECT * FROM Contacts', 
+                                                                                                [], 
+                                                                                                function(tx, results){
+                                                                                                        var htmlStr=""; 
+                                                                                                        for(var index=0;index<results.rows.length;index++){
+                                                                                                                var item = results.rows.item(index);
+                                                                                                                htmlStr=htmlStr+"<tr><td>"+item.firstName+"</td><td>"+item.lastName+"</td><td><button onclick=\"deleteEntry('"+item.id+"');\">X</button></td></tr>";
+                                                                                                                
+                                                                                                        }
+                                                                                                        dataTable.innerHTML=htmlStr;
+                                                                                                } 
+                                                                                                ,
+                                                                                                function(err){
+                                                                                                        alert("Unable to fetch result from Contacts Table");
+                                                                                                }
+                                                                                        );                                                                                              
+                                                        
+                                                        },
+                                                        //error callback
+                                                        function (err){
+                                                                alert("error callback "+err.code+" "+err.message);
+                                                                
+                                                        },
+                                                        //success callback
+                                                        function (){
+                                                                firstNameBox.value="";
+                                                                lastNameBox.value="";
+                                                                
+                                                        }
+                                                        ); 
+                                
+                                 
+                        }
+                        
+                        function deleteEntry(id){
+                                db.transaction(
+                                                        //function sql statements
+                                                        function (tx){
+                                                                ensureTableExists(tx);
+                                                                tx.executeSql('Delete FROM Contacts where id='+id);                                                                                             
+                                                        
+                                                        },
+                                                        //error callback
+                                                        function (err){
+                                                                alert("error callback "+err.code+" "+err.message);
+                                                                
+                                                        },
+                                                        //success callback
+                                                        function (err){
+                                                                //alert("success callback ");
+                                                                loadFromDB();
+                                                                
+                                                        }
+                                                        );
+                                
+                                 
+                        }
+                        
+            function ensureTableExists(tx){
+                        tx.executeSql('CREATE TABLE IF NOT EXISTS Contacts (id INTEGER PRIMARY KEY, firstName,lastName)');
+                        
+                        }
+            /** Called when browser load this page*/
+            function init(){
+                document.addEventListener("deviceready", onDeviceReady, false);
+            }
+        </script>
+        <style>
+            td {
+                width: 100px;
+            }
+            
+            input {
+                width: 100px;
+            }
+        </style>
+    </head>
+    <body onLoad="init()">
+    <div data-role="header">
+    
+	
+	<a href="javascript:history.back(-1)" data-icon="arrow-l">Regresar</a>	
+    <h1>Bienvenido</h1>
+    <a href='index.html' data-icon="back" data-theme="b">Salir</a>
+	</div>
+        <h3>Agregar,Consultar y eliminar un registro de BD </h3>
+       
+   
+        <table width="335">
+            <tr>
+                <td>Nombre:
+                    <input id="firstName" type="text">
+                    </input>
+                </td></tr>
+                <td>Apellidos:
+                    <input id="lastName" type="text">
+                    </input>
+                </td></tr>
+                <td>
+                    <button id="add">
+                        Agregar
+                    </button>
+                </td>
+            </tr>
+        </table>
+         
+          <table><tr> 
+          <td>Nombre </td>
+          <td>Apellidos </td>
+          <td>Acción </td>
+    </tr></table>
+        <table id="data-table">
+        </table>
+    </body>
+</html>

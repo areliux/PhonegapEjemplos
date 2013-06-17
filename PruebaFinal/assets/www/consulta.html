@@ -1,0 +1,51 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <title>PhoneGap DB</title>
+         <meta charset="UTF-8">
+         <link rel="stylesheet" href="http://code.jquery.com/mobile/1.3.1/jquery.mobile-1.3.1.min.css" />
+  <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+  <script src="http://code.jquery.com/mobile/1.3.1/jquery.mobile-1.3.1.min.js"></script>
+        <script type="text/javascript" charset="utf-8" src="file:///C|/Users/Diagnosis3/workspace/PruebaStorage/assets/www/cordova-2.7.0.js"></script>
+        
+    </head>
+    <body onLoad="init()">
+    <div data-role="header">
+ 
+	<a href="javascript:history.back(-1)" data-icon="arrow-l">Regresar</a>	
+    <h1>Bienvenido</h1>
+    <a href='file:///C|/Users/Diagnosis3/workspace/PruebaStorage/assets/www/index.html' data-icon="back" data-theme="b">Salir</a>
+	</div>
+    <a href="javascript:document.location.reload();">Refrescar</a>
+    <div id="output"></div> 
+    </body>
+    
+    <script>
+	
+	$(document).ready(function(){
+	var output = $('#output');
+	
+	$.ajax({
+		url: 'http://pruebaapp.bugs3.com/mostrar_Datos.php',
+		dataType: 'jsonp',
+		jsonp: 'jsoncallback',
+		timeout: 5000,
+		success: function(data, status){
+			$.each(data, function(i,item){ 
+				var contactos = '<h1>'+item.nombre+'</h1>'
+				+ '<p>'+item.tel+'<br>'
+				+ '<p>'+item.cel+'<br>'
+				+ item.correo+'</p>';
+				
+				output.append(contactos);
+				 var data = jquery.parseJSON(data);
+			});
+		},
+		error: function(){
+			output.text('There was an error loading the data.');
+		}
+	});
+});
+
+	</script>
+</html>

@@ -1,0 +1,776 @@
+<!DOCTYPE html> 
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Validacion de usuarios</title>
+  <link rel="stylesheet" href="themes/styleJquery.min.css" />
+  
+  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.3.1/jquery.mobile-1.3.1.min.css" />
+  <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+  <script src="http://code.jquery.com/mobile/1.3.1/jquery.mobile-1.3.1.min.js"></script>
+<script type="text/javascript"
+    src="https://maps.google.com/maps/api/js?sensor=true">
+</script>
+     <script type="text/javascript" charset="utf-8" src="cordova-2.7.0.js"></script>
+    <script type="text/javascript" charset="utf-8" src="json2.js"></script>
+   
+      <script type="text/javascript" charset="utf-8">
+//Captura de video
+        // Llamado cuando el proceso de captura finalice
+        //
+        function captureSuccess(mediaFiles) {
+            var i, len;
+            for (i = 0, len = mediaFiles.length; i < len; i += 1) {
+                uploadFile(mediaFiles[i]);
+            }	    
+        }
+
+        // Llamado si ocurre algÃºn error
+        // 
+        function captureError(error) {
+	        var msg = 'Ocurrio un error mientras se capturaba: ' + error.code;
+            navigator.notification.alert(msg, null, 'Uh oh!');
+        }
+
+        // Un botÃ³n llamara esta funciÃ³n
+        //
+        function captureVideo() {
+            // Inicia la aplicaciÃ³n de grabaciÃ³n
+            // y permite capturar hasta 2 clips de vÃ­deo
+            navigator.device.capture.captureVideo(captureSuccess, captureError, {limit: 12});
+        }
+
+        // Sube los ficheros al servidor
+        function uploadFile(mediaFile) {
+            var ft = new FileTransfer(),
+                path = mediaFile.fullPath,
+                name = mediaFile.name;
+
+            ft.upload(path,
+                "http://my.domain.com/upload.php",
+                function(result) {
+                    console.log('Subida correcta: ' + result.responseCode);
+                    console.log(result.bytesSent + ' bytes enviados');
+                },
+                function(error) {
+                    console.log('Error en la subida del fichero ' + path + ': ' + error.code);
+                },
+                { fileName: name });   
+        }
+
+        </script>
+        
+        
+        
+    <script type="text/javascript" charset="utf-8">
+///Funcion de captura de imagen
+
+    // Función 'callback' satisfactoria
+    //
+    function captureSuccess(mediaFiles) {
+        var i, len;
+        for (i = 0, len = mediaFiles.length; i < len; i += 1) {
+            uploadFile(mediaFiles[i]);
+        }       
+    }
+
+    // Llamada si algún error ocurre.
+    // 
+    function captureError(error) {
+        var msg = 'Ocurrió un error mientras se capturaba: ' + error.code;
+        navigator.notification.alert(msg, null, 'Uh oh!');
+    }
+
+    // Un botón llamara esta función
+    //
+    function captureImage() {
+        // Lanza la aplicación de cámara, 
+        // y permite capturar hasta 2 imágenes
+        navigator.device.capture.captureImage(captureSuccess, captureError, {limit: 32});
+    }
+
+    // Sube los ficheros al servidor
+    function uploadFile(mediaFile) {
+        var ft = new FileTransfer(),
+            path = mediaFile.fullPath,
+            name = mediaFile.name;
+
+        ft.upload(path,
+            "http://my.domain.com/upload.php",
+            function(result) {
+                console.log('Subida correcta: ' + result.responseCode);
+                console.log(result.bytesSent + ' bytes enviados');
+            },
+            function(error) {
+                console.log('Error en la subida del fichero ' + path + ': ' + error.code);
+            },
+            { fileName: name });   
+    }
+
+    </script> 
+ <script type="text/javascript" charset="utf-8">
+
+    var pictureSource;   // Origen de la imagen
+    var destinationType; // Formato del valor retornado
+
+    // Espera a que PhoneGap conecte con el dispositivo.
+    //
+    document.addEventListener("deviceready",onDeviceReady,false);
+
+    // PhoneGap esta listo para usarse!
+    //
+    function onDeviceReady() {
+        pictureSource=navigator.camera.PictureSourceType;
+        destinationType=navigator.camera.DestinationType;
+    }
+
+    // Llamada cuando la foto se retorna sin problemas
+    //
+    function onPhotoDataSuccess(imageData) {
+      // Descomenta esta linea para ver la imagen codificada en base64
+      // console.log(imageData);
+
+      // Obtiene el elemento HTML de la imagen
+      //
+      var smallImage = document.getElementById('smallImage');
+
+      // Revela el elemento de la imagen
+      //
+      smallImage.style.display = 'block';
+
+      // Muestra la foto capturada
+      // Se usan reglas CSS para dimensionar la imagen
+      //
+      smallImage.src = "data:image/jpeg;base64," + imageData;
+    }
+
+    // Llamada cuando la foto se retorna sin problemas
+    //
+    function onPhotoURISuccess(imageURI) {
+      // Descomenta esta linea para ver la ruta URI al fichero de imagen 
+      // console.log(imageURI);
+
+      // Obtiene el elemento HTML de la imagen
+      //
+      var largeImage = document.getElementById('largeImage');
+
+      // Revela el elemento de la imagen
+      //
+      largeImage.style.display = 'block';
+
+      // Muestra la foto capturada
+      // Se usan reglas CSS para dimensionar la imagen
+      //
+      largeImage.src = imageURI;
+    }
+
+    // Un botón llamara a esta función
+    //
+function capturePhoto(){
+	navigator.camera.getPicture(uploadPhoto,null,{sourceType:1,quality:60});
+}
+    // Un botón llamara a esta función
+    //
+    function capturePhotoEdit() {
+      // Toma la imagen, permite editarla y la retorna como una string codificada en base64
+      navigator.camera.getPicture(onPhotoDataSuccess, onFail, { quality: 20, allowEdit: true }); 
+    }
+
+    // Un botón llamara a esta función
+    //
+    function getPhoto(source) {
+      // Retorna la ruta del fichero de imagen desde el origen especificado
+      navigator.camera.getPicture(onPhotoURISuccess, onFail, { quality: 50, 
+        destinationType: destinationType.FILE_URI,
+        sourceType: source });
+    }
+
+    // Llamado cuando algo malo ocurre
+    // 
+    function onFail(message) {
+      alert('Ocurrió un error: ' + message);
+    }
+
+navigator.notification.alert(message, alertCallback, [title], [buttonName])
+navigator.notification.alert(
+	'Tu foto ha sido guardada',	// message
+	okay,					        // callback
+	'Foto guardada',            	// title
+	'OK'                  			// buttonName
+);
+function uploadPhoto(data){
+// this is where you would send the image file to server
+	cameraPic.src = "data:image/jpeg;base64," + data;
+	// Successful upload to the server
+	navigator.notification.alert(
+		'Tu foto ha sido guardada',  // message
+		okay,                           // callback
+	    'Foto guardada',              // title
+	    'OK'                          // buttonName
+	);
+	// upload has failed Fail
+	/*
+	if (failedToUpload){
+	navigator.notification.alert(
+		'Your Photo has failed to upload',
+		failedDismissed,
+	    'Photo Not Uploaded',
+	    'OK'
+		);
+	}
+	*/
+}
+function okay(){
+	// Do something
+}
+    </script>  
+    <style type="text/css">
+
+#map_canvas {
+	height: 90%
+}
+</style>
+<script type="text/javascript">
+//Funcion que inicializa la geolocalizacion
+//devuelve los resultados de la consulta
+  function initialize() {
+	  //variable que obtiene la latitud y longitud por defecto para la inicializacion 
+    var latlng = new google.maps.LatLng(-34.397, 150.644);
+	//JSON quee obtiene las caracteristicas necesarias del mapa
+    var myOptions = {
+      zoom: 18, //zoom que tendra de aproximidad del mapa
+      center: latlng, //se ubicara en el centro de los puntos de latitud y longitud
+      mapTypeId: google.maps.MapTypeId.SATELLITE, //Tipo de mapa 
+	  //funciones basicas del google maps que no se haran
+	  draggable:false,
+	  KeyBoardShortcuts:false,
+	  mapTypeControl:false,
+	  navigationControl:false,
+	  scrollwheel:false,
+	  streetViewControl: false
+    };
+	//Obtiene el elemento del mapa en la variable 
+map_element = document.getElementById ("map_canvas");
+   map = new google.maps.Map(map_element,
+        myOptions);
+//Coloca un marcador en la posicion que se encuentre en la variable map		
+  marcador=new google.maps.Marker({position:latlng,
+  map:map})
+  
+  }
+//Mostrar el grafico mediante su lat y long, y un estimado de tiempo de espera  
+function mostrarUbicacion(){
+	navigator.geolocation.getCurrentPosition(lecturaGPS,errorGPS,{ maximumAge: 3000, timeout: 5000, enableHighAccuracy: true })
+	
+	}
+//Se muestra la lectura de la ubicacion 	
+function lecturaGPS(ubicacion){
+var miubicacion=new google.maps.LatLng(ubicacion.coords.latitude,ubicacion.coords.longitude);
+//el marcador y el center exactamente con los valores del mapa ya antes realizado 	
+	map.setCenter(miubicacion)
+	marcador.setPosition(miubicacion)
+//variables de la lat y long necesarios 		
+var latitud = ubicacion.coords.latitude;
+var longitud = ubicacion.coords.longitude;
+//imprimimos los valores
+console.log(latitud,longitud)
+//mapa estatico que muestra la ubicacion 
+mapa = document.getElementById("mapa");
+mapa.src = "http://maps.google.com/maps/api/staticmap?center=" + latitud + "," + longitud + "&zoom=18&size=800x800&markers=color:green|label:A|" + latitud + "," + longitud + "&maptype=satellite&sensor=false";
+
+  var contenedor = document.getElementById("contenedor");
+   contenedor.innerHTML = longitud; 
+   
+   var contenedor = document.getElementById("contenedor2");
+   contenedor.innerHTML = latitud; 
+	}
+//Si no te encuentra, enviara un mensaje que no se puede encontrar el lugar
+function errorGPS(){
+	alert("No puedo encontrarte :( ");
+	}
+/**************************************************/	
+/*Guardar imagen*/	
+
+ //Variables del formulario 
+ //variables para la conexion a la BD
+            var db = null;
+            var dataTable = null;
+			//mapitaImage=mapa.value;
+
+
+
+    // Función 'callback' de transacción satisfactoria
+    //
+    function successCB() {
+        //alert("bien!");
+    }
+</script>
+<script type="text/javascript" charset="utf-8">
+///Funcion para reproducir un sonido
+
+        // Espere a que PhoneGap se inicie
+        //
+        document.addEventListener("deviceready", onDeviceReady, false);
+
+        // PhoneGap esta listo
+        //
+        function onDeviceReady() {
+            playAudio("http://audio.ibeat.org/content/p1rj1s/p1rj1s_-_rockGuitar.mp3");
+        }
+
+        // Un reproductor de audio
+        //
+        var my_media = null;
+        var mediaTimer = null;
+
+        // Reproduce el audio
+        //
+        function playAudio(src) {
+            // Crea un objeto `Media` desde el argumento
+            my_media = new Media(src, onSuccess, onError);
+
+            // Reproduce el audio
+            my_media.play();
+
+            // Actualiza la posición cada segundo
+            if (mediaTimer == null) {
+                mediaTimer = setInterval(function() {
+                    // Obtiene la posición actual
+                    my_media.getCurrentPosition(
+                        // Función 'callback' satisfactoria
+                        function(position) {
+                            if (position > -1) {
+                                setAudioPosition((position) + " seg.");
+                            }
+                        },
+                        // Función 'callback' de error
+                        function(e) {
+                            console.log("Error obteniendo posición" + e);
+                            setAudioPosition("Error: " + e);
+                        }
+                    );
+                }, 1000);
+            }
+        }
+
+        // Pausa la reproducción
+        // 
+        function pauseAudio() {
+            if (my_media) {
+                my_media.pause();
+            }
+        }
+
+        // Detiene la reproducción
+        // 
+        function stopAudio() {
+            if (my_media) {
+                my_media.stop();
+            }
+            clearInterval(mediaTimer);
+            mediaTimer = null;
+        }
+
+        // Función 'callback' onSuccess
+        //
+        function onSuccess() {
+            console.log("playAudio():Audio correcto");
+        }
+
+        // Función 'callback' onError
+        //
+        function onError(error) {
+            alert('código: '  + error.code    + '\n' + 
+                  'mensaje: ' + error.message + '\n');
+        }
+
+        // Muestra la posición
+        // 
+        function setAudioPosition(position) {
+            document.getElementById('audio_position').innerHTML = position;
+        }
+
+        </script>
+         <script type="text/javascript" charset="utf-8">
+///Funcion del acelerometro 
+
+    // El identificador del visor de aceleración a detener
+    var watchID = null;
+
+    // Espera a que PhoneGap se inicie
+    //
+    document.addEventListener("deviceready", onDeviceReady, false);
+
+    // PhoneGap esta listo
+    //
+    function onDeviceReady() {
+        startWatch();
+    }
+
+    // Empieza a observar la aceleración
+    //
+    function startWatch() {
+
+        // Actualiza cada 3 segundos
+        var options = { frequency: 3000 };
+
+        watchID = navigator.accelerometer.watchAcceleration(onSuccess, onError, options);
+    }
+
+    // Deja de observar la aceleración
+    //
+    function stopWatch() {
+        if (watchID) {
+            navigator.accelerometer.clearWatch(watchID);
+            watchID = null;
+        }
+    }
+
+    // onSuccess: Obtiene el resultado de la aceleración actual
+    //
+    function onSuccess(acceleration) {
+        var element = document.getElementById('accelerometer');
+        element.innerHTML = 'Aceleración X: ' + acceleration.x + '<br />' +
+                            'Aceleración Y: ' + acceleration.y + '<br />' +
+                            'Aceleración Z: ' + acceleration.z + '<br />' + 
+                            'Timestamp: '      + acceleration.timestamp + '<br />';
+    }
+
+    // onError: Fallo al obtener la aceleración
+    //
+    function onError() {
+        alert('onError!');
+    }
+
+    </script>
+</head>
+
+<body onload="initialize(),init()"> 
+
+<!--div data-role="page" id="inicio">
+
+	<div data-role="header">
+		<h1>Autenticacion de Usuario</h1>
+	</div>
+    
+	<div data-role="content">	
+<form name="login">
+<label for="usuario" > <b>Usuario: </b></label>
+ <input type="text" name="usuario" id="usuario"    placeholder="Ingrese el usuario" required/>
+    
+<label for="contrasena"><b> Contrasena:</b> </label> 
+<input type="password"  name="contrasena" id="contrasena"  placeholder="Ingresa la contraseña " required />
+      
+<button class="add" onClick="getUser()" data-inline="true" data-theme="b">Ingresar</button>
+<button class="add" type="reset" value="" data-inline="true" data-theme="d">Cancelar</button>
+
+<p>&nbsp;</p>
+
+
+  </form>		
+        
+        <!--form id="formulario" >
+      
+      			<label> Usuario </label>
+      			<input type="text" id="nombredeusuario" name="nombredeusuario">
+      
+      			<label> Password </label>
+     			<input type="password" id="clave" name="clave" >
+
+      			<input type="submit" value="Acceder" id="botonLogin">
+      
+    		</form>		
+	</div>
+	 
+</div-->
+ 
+<div data-role="page" id="home">
+
+	<div data-role="header">
+    
+	<h1>Bienvenido</h1>
+	<a href='index.html' data-icon="back" data-theme="b" data-iconpos="right">Salir</a>	
+	</div>
+
+	<div data-role="content">	
+		<h2>Ejemplos </h2>
+<div data-role="controlgroup">
+<a href="#registro" data-role="button" data-icon="plus">Agregar dato hacia servidor remoto</a>
+<a href='camara.html' data-role="button" data-icon="grid" rel="external">Almacenamiento interno</a>
+<a href="#fotos" data-role="button" data-icon="grid">Camara fotos</a>
+<a href="#camara" data-role="button" data-icon="grid">Camara video</a>
+<a href="#geo" data-role="button" data-icon="grid">Geolocalización</a>
+<a href="#media" data-role="button" data-icon="grid">Media</a>
+<a href="#acelerometro" data-role="button" data-icon="grid">Acelerometro</a>
+<a href='archivos.html' data-role="button" data-icon="grid"rel="external">Leer y escribir archivos</a>
+
+	</div>
+    </div>
+
+</div>
+
+<div data-role="page" id="registro">
+
+	<div data-role="header">
+    <a href="#home"  data-icon="arrow-l">Regresar</a>
+	<h1>Nuevo contacto</h1>
+	<a href='index.html' data-icon="back" data-theme="b">Salir</a>
+		
+	</div>
+
+	<div data-role="content">	
+		<h3>Ingresa los datos necesarios</h3>
+<form id="form1">
+	<label> Nombre </label>
+   <input type="text" id="nombre" name="nombre">
+   <label> Telefono </label>
+   <input type="text" id="telefono" name="telefono">
+   <label> Celular </label>
+   <input type="text" id="celular" name="celular">
+   <label> Correo </label>
+   <input type="text" id="correo" name="correo">
+   <input type="submit" value="Guardar contacto" id="botonGuardar" data-icon="check">
+ <input type="reset" value="Cancelar" id="botonCancelar" data-icon="delete"></form>
+	</div>
+
+</div>
+<div data-role="page" id="agenda">
+
+	<div data-role="header">
+      <a href="#home"  data-icon="arrow-l">Regresar</a>
+	<h1>Contactos</h1>
+	<a href='index.html' data-icon="back" data-theme="b">Salir</a>
+	</div>
+
+	<div data-role="content">	
+		 <h3>Agregar, Consultar y eliminar datos</h3>
+        
+        <table id="data-table">
+        </table>
+        <table>
+            <tr>
+                <td>Nombre:
+                    <input id="firstName" type="text">
+                    </input>
+                </td>
+                
+                </tr><td>Apellido
+                    <input id="lastName" type="text">
+                    </input>
+                </td>
+               
+                </tr> <td>
+                    <button id="add">
+                        Agregar
+                    </button>
+                </td>
+            </tr>
+        </table>
+</div>	</div>
+
+</div>
+
+<div data-role="page" id="camara">
+
+	<div data-role="header">
+      <a href="#home"  data-icon="arrow-l">Regresar</a>
+	<h1>Capturar video</h1>
+	<a href='index.html' data-icon="back" data-theme="b">Salir</a>
+	</div>
+
+	<div data-role="content">	
+		
+        
+         <button onclick="captureVideo();">Capturar video</button> <br>	</div>
+
+</div>
+
+<div data-role="page" id="fotos">
+
+	<div data-role="header">
+      <a href="#home"  data-icon="arrow-l">Regresar</a>
+	<h1>Capturar foto</h1>
+	<a href='index.html' data-icon="back" data-theme="b">Salir</a>
+	</div>
+
+	<div data-role="content">	
+	 <button onclick="captureImage();">Capturar foto</button>	
+	
+</div>
+        
+       <!--button onclick="capturePhoto();">Capturar foto</button> <br>
+    <!--button onclick="capturePhotoEdit();">Capturar foto editable</button--> <br>
+    <button onclick="getPhoto(pictureSource.PHOTOLIBRARY);">Abrir la librería de imágenes</button><br>
+    <!--button onclick="getPhoto(pictureSource.SAVEDPHOTOALBUM);">Desde el álbum de fotos</button--><br>
+    <img style="display:none;width:60px;height:60px;" id="smallImage" src="" />
+    <img style="display:none;" id="largeImage" src="" /> 
+    </div>
+
+</div>
+
+<div data-role="page" id="geo">
+
+	<div data-role="header">
+      <a href="#home"  data-icon="arrow-l">Regresar</a>
+	<h1>Geolocalización</h1>
+	<a href='index.html' data-icon="back" data-theme="b">Salir</a>
+	</div>
+
+	<div data-role="content">	
+
+  <button onClick="mostrarUbicacion()">Localizar </button>
+  
+  	<p><img id="mapa"  src=""></p>	
+<div id="map_canvas" style="width:100%; height:100%">
+</div>
+
+longitud:<div id="contenedor">
+    </div>
+latitud:<div id="contenedor2">
+    </div>
+
+</div>
+</div>
+
+<div data-role="page" id="media">
+
+	<div data-role="header">
+      <a href="#home"  data-icon="arrow-l">Regresar</a>
+	<h1>Media </h1>
+	<a href='index.html' data-icon="back" data-theme="b">Salir</a>
+	</div>
+
+	<div data-role="content">	
+  <a href="#" class="btn large" onclick="playAudio('http://audio.ibeat.org/content/p1rj1s/p1rj1s_-_rockGuitar.mp3');">Reproducir</a>
+        <a href="#" class="btn large" onclick="pauseAudio();">Pausa</a>
+        <a href="#" class="btn large" onclick="stopAudio();">Detener</a>
+        <p id="audio_position"></p>
+
+</div>
+</div>
+
+
+<div data-role="page" id="acelerometro">
+
+	<div data-role="header">
+      <a href="#home"  data-icon="arrow-l">Regresar</a>
+	<h1>Acelerometro</h1>
+	<a href='index.html' data-icon="back" data-theme="b">Salir</a>
+	</div>
+
+	<div data-role="content">	
+  <div id="accelerometer">Esperando al acelerómetro...</div>
+    <button onclick="stopWatch();">Detener el visor</button>
+</div>
+</div>
+<div data-role="page" id="archivo">
+
+	<div data-role="header">
+      <a href="#home"  data-icon="arrow-l">Regresar</a>
+	<h1>Leer y escribir archivos</h1>
+	<a href='index.html' data-icon="back" data-theme="b">Salir</a>
+	</div>
+
+	<div data-role="content">	
+ <h2>Escribe la información que deseas guardar </h2>
+        <table width="476">
+            <tr>
+                <td colspan="2">
+                    /sdcard/read-write.txt
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <textarea id="textarea" rows="10" cols="30" style="width:100%">
+                    </textarea>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <button id="read">Leer archivo</button>
+                </td>
+                <td>
+                    <button id="write">Escribir archivo</button>
+                </td>
+            </tr>
+        </table>
+
+
+</div>
+</div>
+ 
+<script>
+///Funcion para validación de inicio de sesion
+$('#formulario').submit(function() { 
+	
+	 
+	// recolecta los valores que inserto el usuario
+	var datosUsuario = $("#nombredeusuario").val()
+	var datosPassword = $("#clave").val()
+	
+  	archivoValidacion = "http://revolucion.mobi/ejemplos/phonegap/envioFormulario/validacion_de_datos.php?jsoncallback=?"
+  //archivoValidacion = "http://pruebaapp.bugs3.com/validacion_de_datos.php?jsoncallback=?"
+
+	$.getJSON( archivoValidacion, { usuario:datosUsuario ,password:datosPassword})
+	.done(function(respuestaServer) {
+		
+		alert(respuestaServer.mensaje + "\nGenerado a las: " + respuestaServer.hora + "\n" +respuestaServer.generador)
+		
+		if(respuestaServer.validacion == "ok"){
+		  
+		 	/// si la validacion es correcta, muestra la pantalla "home"
+			$.mobile.changePage("#home")
+		  
+		}else{
+		  
+		  /// ejecutar una conducta cuando la validacion falla
+		}
+  
+	})
+	return false;
+})
+
+</script>
+<script>
+///Almacenamiento remoto hacia servidor mysql
+        $(function() {
+
+            $("#botonGuardar").click(function() {
+                var nombre = $("#nombre").val();
+    var celular = $("#celular").val();
+    var telefono = $("#telefono").val();
+	var correo= $("#correo").val();
+$("#nombre").val(" ");
+    $("#celular").val(" ");
+    $("#telefono").val(" ");
+	  $("#correo").val(" ");
+               
+                    $.ajax({
+                      type: "POST",
+                      url: "http://pruebaapp.bugs3.com/guardar_de_datos.php",
+                      data: ({nom: nombre, cel: celular, tel: telefono,correo:correo }),
+                      cache: false,
+                      dataType: "text",
+                      success: onSuccess,
+					  error: onfal
+                    });
+               
+            });
+
+        
+            function onSuccess()
+            {
+            
+        window.location='#home';
+            }
+			
+			function onfal(){
+				window.location='#registro';
+				}
+
+        });
+    </script>
+</script>
+
+</body>
+</html>
